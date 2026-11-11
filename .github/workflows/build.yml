@@ -1,33 +1,29 @@
 name: Build Patched AirPort_RTW88
-
 on:
   workflow_dispatch:
   push:
 
 jobs:
   build:
-    runs-on: macos-15-intel
+    runs-on: macos-latest
     steps:
       - name: Checkout patched repository
         uses: actions/checkout@v4
 
-      - name: Fetch rtw88 driver sources
-        run: |
-          git clone --depth 1 "https://github.com/lwfinger/rtw88.git" ../rtw88-stable
+      - name: Checkout Linux v6.12 rtw88 driver
+        uses: actions/checkout@v4
+        with:
+          repository: torvalds/linux
+          ref: v6.12
+          sparse-checkout: drivers/net/wireless/realtek/rtw88
+          sparse-checkout-cone-mode: false
+          path: ../rtw88-stable
 
-      - name: Fix Xcode 16 fallthrough macro collision
-        run: |
-          python3 -c '
-          p = "src/compat/rtw88_compat.h"
-          s = open(p).read()
-          s = s.replace("#define fallthrough __attribute__((__fallthrough__))", "#include <os/base.h>\n#ifndef fallthrough\n#define fallthrough __attribute__((__fallthrough__))\n#endif")
-          open(p, "w").write(s)
-          '
+      - name: Fix fallthrough macro
+        run: sed -i '' 's|#define fallthrough __attribute__((__fallthrough__))|#include <os/base.h>|g' src/compat/rtw88_compat.h
 
       - name: Build AirPort_RTW88.kext
-        run: |
-          make airport -j4
-          ls -la build/out/AirPort_RTW88.kext
+        run: make airport -j4
 
       - name: Upload Compiled Kext
         uses: actions/upload-artifact@v4
