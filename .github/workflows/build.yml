@@ -1,0 +1,26 @@
+name: Build Patched Kext
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build AirPort_RTW88
+        run: |
+          xcodebuild -project rtw88.xcodeproj \
+            -alltargets \
+            -configuration Release \
+            -derivedDataPath ./build \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Upload Compiled Kext
+        uses: actions/upload-artifact@v4
+        with:
+          name: AirPort_RTW88-Patched
+          path: build/Build/Products/Release/*.kext
