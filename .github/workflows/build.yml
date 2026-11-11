@@ -86,8 +86,7 @@ jobs:
           EOF
 
       - name: Build AirPort_RTW88.kext
-        run: make airport -j4
-
+        run: make airport -j1 2>&1 | grep -C 3 "error:"
       - name: Upload Compiled Kext
         uses: actions/upload-artifact@v4
         with:
