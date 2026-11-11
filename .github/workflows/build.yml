@@ -23,6 +23,7 @@ jobs:
         run: |
           mv rtw88-stable ../rtw88-stable
           sed -i '' 's|#define fallthrough __attribute__((__fallthrough__))|#include <os/base.h>|g' src/compat/rtw88_compat.h
+          printf '\n#define fallthrough __attribute__((__fallthrough__))\n' >> src/compat/rtw88_compat.h
           mkdir -p AirPort_RTW88.kext/Contents
           cat << 'EOF' > AirPort_RTW88.kext/Contents/Info.plist
           <?xml version="1.0" encoding="UTF-8"?>
