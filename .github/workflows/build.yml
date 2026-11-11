@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     steps:
       - name: Checkout patched repository
         uses: actions/checkout@v4
@@ -17,10 +17,12 @@ jobs:
           ref: v6.12
           sparse-checkout: drivers/net/wireless/realtek/rtw88
           sparse-checkout-cone-mode: false
-          path: ../rtw88-stable
+          path: rtw88-stable
 
-      - name: Fix fallthrough macro
-        run: sed -i '' 's|#define fallthrough __attribute__((__fallthrough__))|#include <os/base.h>|g' src/compat/rtw88_compat.h
+      - name: Move rtw88-stable & fix fallthrough macro
+        run: |
+          mv rtw88-stable ../rtw88-stable
+          sed -i '' 's|#define fallthrough __attribute__((__fallthrough__))|#include <os/base.h>|g' src/compat/rtw88_compat.h
 
       - name: Build AirPort_RTW88.kext
         run: make airport -j4
