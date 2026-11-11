@@ -10,7 +10,7 @@ jobs:
       - name: Checkout patched repository
         uses: actions/checkout@v4
 
-      - name: Checkout Linux v6.12 rtw88 driver
+      - name: Checkout Linux v6.16 rtw88 driver
         uses: actions/checkout@v4
         with:
           repository: torvalds/linux
@@ -19,11 +19,16 @@ jobs:
           sparse-checkout-cone-mode: false
           path: rtw88-stable
 
-      - name: Prepare sources & Info.plist skeleton
+      - name: Prepare sources, shims & Info.plist
         run: |
           mv rtw88-stable ../rtw88-stable
           sed -i '' 's|#define fallthrough __attribute__((__fallthrough__))|#include <os/base.h>|g' src/compat/rtw88_compat.h
           printf '\n#define fallthrough __attribute__((__fallthrough__))\n' >> src/compat/rtw88_compat.h
+          printf '\n#define alloc_netdev_dummy(sz) alloc_netdev((sz), "dummy%%d", 0, NULL)\n' >> src/compat/linux/netdevice.h
+          sed -i '' 's|(\*config)(struct ieee80211_hw \*hw, int radio_idx, u32 changed)|(*config)(struct ieee80211_hw *hw, u32 changed)|g' src/compat/net/mac80211.h
+          sed -i '' 's|(\*set_rts_threshold)(struct ieee80211_hw \*hw, int radio_idx, u32 value)|(*set_rts_threshold)(struct ieee80211_hw *hw, u32 value)|g' src/compat/net/mac80211.h
+          sed -i '' 's|(\*set_antenna)(struct ieee80211_hw \*hw, int radio_idx, u32 tx_ant, u32 rx_ant)|(*set_antenna)(struct ieee80211_hw *hw, u32 tx_ant, u32 rx_ant)|g' src/compat/net/mac80211.h
+          sed -i '' 's|(\*get_antenna)(struct ieee80211_hw \*hw, int radio_idx, u32 \*tx_ant, u32 \*rx_ant)|(*get_antenna)(struct ieee80211_hw *hw, u32 *tx_ant, u32 *rx_ant)|g' src/compat/net/mac80211.h
           mkdir -p AirPort_RTW88.kext/Contents
           cat << 'EOF' > AirPort_RTW88.kext/Contents/Info.plist
           <?xml version="1.0" encoding="UTF-8"?>
@@ -86,7 +91,8 @@ jobs:
           EOF
 
       - name: Build AirPort_RTW88.kext
-        run: make airport -j1 2>&1 | grep -C 3 "error:"
+        run: make airport -j4
+
       - name: Upload Compiled Kext
         uses: actions/upload-artifact@v4
         with:
