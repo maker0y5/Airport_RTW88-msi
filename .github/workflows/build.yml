@@ -15,7 +15,7 @@ jobs:
           xcodebuild -project rtw88.xcodeproj \
             -alltargets \
             -configuration Release \
-            -derivedDataPath ./build \
+            CONFIGURATION_BUILD_DIR="$PWD/build_out" \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO
 
@@ -23,4 +23,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AirPort_RTW88-Patched
-          path: build/Build/Products/Release/*.kext
+          path: build_out/*.kext
