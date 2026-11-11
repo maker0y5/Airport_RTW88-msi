@@ -19,10 +19,70 @@ jobs:
           sparse-checkout-cone-mode: false
           path: rtw88-stable
 
-      - name: Move rtw88-stable & fix fallthrough macro
+      - name: Prepare sources & Info.plist skeleton
         run: |
           mv rtw88-stable ../rtw88-stable
           sed -i '' 's|#define fallthrough __attribute__((__fallthrough__))|#include <os/base.h>|g' src/compat/rtw88_compat.h
+          mkdir -p AirPort_RTW88.kext/Contents
+          cat << 'EOF' > AirPort_RTW88.kext/Contents/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://apple.com">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleDevelopmentRegion</key>
+            <string>English</string>
+            <key>CFBundleExecutable</key>
+            <string>AirPort_RTW88</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.xnoah222.AirPort-RTW88</string>
+            <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+            <key>CFBundleName</key>
+            <string>AirPort_RTW88</string>
+            <key>CFBundlePackageType</key>
+            <string>KEXT</string>
+            <key>CFBundleShortVersionString</key>
+            <string>2.0.1</string>
+            <key>CFBundleVersion</key>
+            <string>2.0.1</string>
+            <key>IOKitPersonalities</key>
+            <dict>
+              <key>RTW88PCI</key>
+              <dict>
+                <key>CFBundleIdentifier</key>
+                <string>com.xnoah222.AirPort-RTW88</string>
+                <key>IOClass</key>
+                <string>AirportRTW88</string>
+                <key>IOMatchCategory</key>
+                <string>IODefaultMatchCategory</string>
+                <key>IOPCIPrimaryMatch</key>
+                <string>0xb82210ec 0xc82210ec 0xc82110ec 0xd82110ec 0xb81210ec 0x881210ec 0x882110ec 0x881310ec</string>
+                <key>IOProbeScore</key>
+                <integer>1000</integer>
+                <key>IOProviderClass</key>
+                <string>IOPCIDevice</string>
+              </dict>
+            </dict>
+            <key>OSBundleLibraries</key>
+            <dict>
+              <key>com.apple.iokit.IO80211FamilyLegacy</key>
+              <string>1200.12.2b1</string>
+              <key>com.apple.iokit.IONetworkingFamily</key>
+              <string>3.0</string>
+              <key>com.apple.iokit.IOPCIFamily</key>
+              <string>2.9</string>
+              <key>com.apple.kpi.bsd</key>
+              <string>16.0.0</string>
+              <key>com.apple.kpi.iokit</key>
+              <string>16.0.0</string>
+              <key>com.apple.kpi.libkern</key>
+              <string>16.0.0</string>
+              <key>com.apple.kpi.mach</key>
+              <string>16.0.0</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
 
       - name: Build AirPort_RTW88.kext
         run: make airport -j4
