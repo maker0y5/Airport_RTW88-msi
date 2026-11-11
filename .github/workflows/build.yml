@@ -1,20 +1,19 @@
 name: Build Patched AirPort_RTW88
+
 on:
   workflow_dispatch:
   push:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     steps:
       - name: Checkout patched repository
         uses: actions/checkout@v4
 
-      - name: Fetch Linux v6.12 rtw88 driver sources
+      - name: Fetch rtw88 driver sources
         run: |
-          git clone --depth 1 --branch v6.12 --filter=blob:none --sparse https://github.com ../rtw88-stable
-          cd ../rtw88-stable
-          git sparse-checkout set drivers/net/wireless/realtek/rtw88
+          git clone --depth 1 "https://github.com/lwfinger/rtw88.git" ../rtw88-stable
 
       - name: Fix Xcode 16 fallthrough macro collision
         run: |
