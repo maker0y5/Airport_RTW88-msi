@@ -10,17 +10,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build AirPort_RTW88
+      - name: Build Kext with Make
         run: |
-          xcodebuild -project rtw88.xcodeproj \
-            -alltargets \
-            -configuration Release \
-            CONFIGURATION_BUILD_DIR="$PWD/build_out" \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=NO
+          make -j4
+          ls -la
 
       - name: Upload Compiled Kext
         uses: actions/upload-artifact@v4
         with:
           name: AirPort_RTW88-Patched
-          path: build_out/*.kext
+          path: |
+            *.kext
+            build/*.kext
