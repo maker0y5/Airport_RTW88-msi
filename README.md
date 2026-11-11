@@ -1,3 +1,4 @@
+**credits to https://github.com/xnoah222 **
 **Native-style AirPort Wi-Fi support for selected Realtek RTL88xx PCIe adapters on macOS.**
 
 AirPort_RTW88 brings Realtek wireless hardware into macOS through the native AirPort/IO80211 networking architecture. The goal is to make compatible adapters usable through the system's Wi-Fi interface rather than presenting them as conventional Ethernet devices or requiring a separate application to manage connections.
